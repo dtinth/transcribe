@@ -15,7 +15,7 @@ Some help would be appreciated.
 
 ## How to use
 
-Open the Xcode project and click **Run.**
+Open the Xcode project and click **Run.** Make sure Dictation feature is enabled in your system preferences, easiest way to enable this is by enabling Siri.
 
 ## Ideas
 
