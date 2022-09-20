@@ -6,7 +6,7 @@ let app = NSApplication.shared
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     private let audioEngine = AVAudioEngine()
-    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "th"))
+    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en"))
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
 
