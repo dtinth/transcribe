@@ -6,11 +6,19 @@ let app = NSApplication.shared
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     private let audioEngine = AVAudioEngine()
-    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "th"))
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // get language from command line
+        let args = CommandLine.arguments
+        var locale = Locale(identifier: "en-US")
+        if args.count > 1 {
+            locale = Locale(identifier: args[1])
+        }
+
+        let speechRecognizer = SFSpeechRecognizer(locale: locale)
+
         let inputNode = audioEngine.inputNode
         let recordingFormat = inputNode.outputFormat(forBus: 0)
         inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { (buffer: AVAudioPCMBuffer, when: AVAudioTime) in
@@ -18,10 +26,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         SFSpeechRecognizer.requestAuthorization({ (authStatus: SFSpeechRecognizerAuthorizationStatus) in
             self.recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
-            guard let speechRecognizer = self.speechRecognizer else { fatalError("Unable to create a SpeechRecognizer object") }
+            guard let guardedSpeechRecognizer = speechRecognizer else { fatalError("Unable to create a SpeechRecognizer object") }
             guard let recognitionRequest = self.recognitionRequest else { fatalError("Unable to create a SFSpeechAudioBufferRecognitionRequest object") }
             recognitionRequest.shouldReportPartialResults = true
-            self.recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest) { result, error in
+            self.recognitionTask = guardedSpeechRecognizer.recognitionTask(with: recognitionRequest) { result, error in
                 var isFinal = false
                 if let result = result {
                     isFinal = result.isFinal

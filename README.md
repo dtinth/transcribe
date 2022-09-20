@@ -8,24 +8,34 @@ CLI tool for macOS that uses SFSpeechRecognizer to transcribe speech from the mi
 
 ## HELP WANTED
 
-- I am a Swift noob. I don’t know how to turn this code into binary... I click run on Xcode and it kinda works, but if I run the binary from the terminal, it crashes.
 - There is no error handling here, sometimes it doesn’t work. I don’t know why.
 
 Some help would be appreciated.
 
 ## How to use
 
-Open the Xcode project and click **Run.** Make sure Dictation feature is enabled in your system preferences, easiest way to enable this is by enabling Siri.
+Compile:
+
+```
+swiftc -o transcriber transcribe/main.swift
+```
+
+Install to `/usr/local/bin`:
+
+```
+cp transcriber /usr/local/bin
+```
+
+Make sure Dictation feature is enabled in your system preferences, easiest way to enable this is by enabling Siri.
 
 ## Change the language
 
-Add a `locale` to the source code like this and run:
+To change the language, you can provide a new language code as the first argument to the binary. For example, to use Thai, you can run:
 
-```diff
--    private let speechRecognizer = SFSpeechRecognizer()
-+    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "th"))
 ```
+./transcriber th
+```
+
 ## Ideas
 
-- Add CLI argument to allow the user to specify the language. Maybe using ArgumentParser? Not sure.
 - Turn this into an HTTP speech recognition server that streams out server-sent events, so other apps can integrate with it, I guess?
