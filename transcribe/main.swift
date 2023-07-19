@@ -5,7 +5,6 @@ import AppKit
 let app = NSApplication.shared
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    private let audioEngine = AVAudioEngine()
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
 
@@ -18,14 +17,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         let speechRecognizer = SFSpeechRecognizer(locale: locale)
-
-        let inputNode = audioEngine.inputNode
-        let recordingFormat = inputNode.outputFormat(forBus: 0)
-        inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { (buffer: AVAudioPCMBuffer, when: AVAudioTime) in
-            self.recognitionRequest?.append(buffer)
-        }
         SFSpeechRecognizer.requestAuthorization({ (authStatus: SFSpeechRecognizerAuthorizationStatus) in
+            if authStatus != .authorized {
+                fatalError("Speech recognition authorization not granted.")
+            }
             self.recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
+
             guard let guardedSpeechRecognizer = speechRecognizer else { fatalError("Unable to create a SpeechRecognizer object") }
             guard let recognitionRequest = self.recognitionRequest else { fatalError("Unable to create a SFSpeechAudioBufferRecognitionRequest object") }
             recognitionRequest.shouldReportPartialResults = true
@@ -43,16 +40,42 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     }
                 }
                 if error != nil || isFinal {
-                    self.audioEngine.stop()
-                    inputNode.removeTap(onBus: 0)
                     self.recognitionRequest = nil
                     self.recognitionTask = nil
                     app.terminate(self)
                 }
             }
+            self.readAudioFromStandardInput()
         })
-        audioEngine.prepare()
-        try! audioEngine.start()
+    }
+    
+    func readAudioFromStandardInput() {
+        let stdinFileDescriptor = FileHandle.standardInput.fileDescriptor
+        let ioChannel = DispatchIO(type: .stream, fileDescriptor: stdinFileDescriptor, queue: DispatchQueue.main) { (error) in
+            if error != 0 {
+                print("Error reading audio from standard input: \(error)")
+            }
+        }
+        ioChannel.setLimit(lowWater: 1)
+        ioChannel.setInterval(interval: .milliseconds(100))
+        ioChannel.read(offset: 0, length: Int.max, queue: DispatchQueue.main) { (done, data, error) in
+            if let data = data, !data.isEmpty {
+                let format = AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: 16000, channels: 1, interleaved: false)
+                let audioBuffer = AVAudioPCMBuffer(pcmFormat: format!, frameCapacity: AVAudioFrameCount(data.count / 2))!
+                audioBuffer.frameLength = audioBuffer.frameCapacity
+                let audioBufferPointer = audioBuffer.int16ChannelData![0]
+                data.withUnsafeBytes { bufferPointer in
+                    audioBufferPointer.initialize(from: bufferPointer, count: data.count / 2)
+                }
+                self.recognitionRequest?.append(audioBuffer)
+            }
+            
+            if done {
+                // Mark the end of the audio stream.
+                self.recognitionRequest?.endAudio()
+            }
+        }
+        ioChannel.resume()
     }
 }
 
