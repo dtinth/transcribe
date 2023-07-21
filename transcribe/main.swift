@@ -26,12 +26,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             guard let guardedSpeechRecognizer = speechRecognizer else { fatalError("Unable to create a SpeechRecognizer object") }
             guard let recognitionRequest = self.recognitionRequest else { fatalError("Unable to create a SFSpeechAudioBufferRecognitionRequest object") }
             recognitionRequest.shouldReportPartialResults = true
+            recognitionRequest.addsPunctuation = true
             self.recognitionTask = guardedSpeechRecognizer.recognitionTask(with: recognitionRequest) { result, error in
                 var isFinal = false
                 if let result = result {
                     isFinal = result.isFinal
+                    var segmentsArray: [[Any]] = []
+                    for segment in result.bestTranscription.segments {
+                        let segmentDict: [Any] = [
+                            segment.substringRange.location,
+                            segment.substringRange.length,
+                            segment.confidence,
+                            segment.timestamp,
+                            segment.duration,
+                        ]
+                        segmentsArray.append(segmentDict)
+                    }
                     let notification: [String: Any] = [
                         "text": result.bestTranscription.formattedString,
+                        "segments": segmentsArray,
                         "isFinal": result.isFinal,
                     ]
                     let jsonData = try! JSONSerialization.data(withJSONObject: notification)

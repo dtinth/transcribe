@@ -1,6 +1,6 @@
 # transcriber
 
-CLI tool for macOS that uses SFSpeechRecognizer to transcribe speech. The recognition result will be written to the standard output as JSON string. The data should be sent to the standard input as **raw PCM, 16-bit signed integer, 16 kHz, mono**.
+CLI tool for macOS that uses SFSpeechRecognizer to transcribe speech. The recognition result will be written to the standard output as JSON string. The input data should be sent to the standard input as **raw PCM, 16-bit signed integer, 16 kHz, mono**.
 
 ![Example screenshot](example.png)
 
