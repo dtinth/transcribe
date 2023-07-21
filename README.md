@@ -31,8 +31,10 @@ Make sure Dictation feature is enabled in your system preferences, easiest way t
 Then you can use it like this:
 
 ```
-rec -b 16 -c 1 -t raw -e signed-integer - rate 16000 | ./transcriber th
+rec -b 16 -c 1 -t raw -e signed-integer - rate 16000 | ./transcriber
 ```
+
+By default it will transcribe English speech.
 
 ## Change the language
 
