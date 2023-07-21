@@ -1,6 +1,6 @@
 # transcriber
 
-CLI tool for macOS that uses SFSpeechRecognizer to transcribe speech from the microphone. The recognition result will be written to the standard output as JSON string.
+CLI tool for macOS that uses SFSpeechRecognizer to transcribe speech. The recognition result will be written to the standard output as JSON string. The input data should be sent to the standard input as **raw PCM, 16-bit signed integer, 16 kHz, mono**.
 
 ![Example screenshot](example.png)
 
@@ -28,12 +28,20 @@ cp transcriber /usr/local/bin
 
 Make sure Dictation feature is enabled in your system preferences, easiest way to enable this is by enabling Siri.
 
+Then you can use it like this:
+
+```
+rec -b 16 -c 1 -t raw -e signed-integer - rate 16000 | ./transcriber
+```
+
+By default it will transcribe English speech.
+
 ## Change the language
 
 To change the language, you can provide a new language code as the first argument to the binary. For example, to use Thai, you can run:
 
 ```
-./transcriber th
+rec -b 16 -c 1 -t raw -e signed-integer - rate 16000 | ./transcriber th
 ```
 
 ## Ideas
