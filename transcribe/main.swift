@@ -27,6 +27,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             guard let recognitionRequest = self.recognitionRequest else { fatalError("Unable to create a SFSpeechAudioBufferRecognitionRequest object") }
             recognitionRequest.shouldReportPartialResults = true
             recognitionRequest.addsPunctuation = true
+            if let onDeviceOnly = ProcessInfo.processInfo.environment["TRANSCRIBE_ON_DEVICE_ONLY"] {
+                if onDeviceOnly == "1" {
+                    recognitionRequest.requiresOnDeviceRecognition = true
+                }
+            }
             self.recognitionTask = guardedSpeechRecognizer.recognitionTask(with: recognitionRequest) { result, error in
                 var isFinal = false
                 if let result = result {
@@ -55,6 +60,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 if error != nil || isFinal {
                     self.recognitionRequest = nil
                     self.recognitionTask = nil
+                    if let error = error {
+                        fatalError(String(describing: error))
+                    }
                     app.terminate(self)
                 }
             }
