@@ -4,6 +4,9 @@ CLI tool for macOS that uses SFSpeechRecognizer to transcribe speech. The recogn
 
 ![Example screenshot](example.png)
 
+![image](https://github.com/dtinth/transcribe/assets/193136/c1cd073b-fd3c-4829-84ff-a2df39d194a6)
+
+
 ⚠️ 🚧 **WARNING:** 💩 code ahead 🚧 ⚠️
 
 ## HELP WANTED
