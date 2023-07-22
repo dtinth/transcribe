@@ -54,7 +54,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     ]
                     let jsonData = try! JSONSerialization.data(withJSONObject: notification)
                     if let jsonString = String(data: jsonData, encoding: String.Encoding.utf8) {
-                       print(jsonString)
+                        print(jsonString)
+                        fflush(stdout)
                     }
                 }
                 if error != nil || isFinal {
