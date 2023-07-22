@@ -44,6 +44,16 @@ To change the language, you can provide a new language code as the first argumen
 rec -b 16 -c 1 -t raw -e signed-integer - rate 16000 | ./transcriber th
 ```
 
+## On-device recognition
+
+Some Mac models support on-device recognition for some language. To require on-device recognition, set the environment variable `TRANSCRIBE_ON_DEVICE_ONLY` to `1`:
+
+```
+TRANSCRIBE_ON_DEVICE_ONLY=1
+```
+
+The CLI will crash if the language is not supported on-device.
+
 ## Ideas
 
 - Turn this into an HTTP speech recognition server that streams out server-sent events, so other apps can integrate with it, I guess?
